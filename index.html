@@ -3,198 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Downloader</title>
+    <title>Monitizer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .navbar {
-            background-color: red;
-            color: white;
-            padding: 10px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9; /* Light gray background */
+            color: #333; /* Dark gray text color */
         }
 
-        .menu-icon {
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .content {
+        #container {
             display: flex;
-            flex-direction: row;
+            flex-wrap: wrap;
+            max-width: 800px;
         }
 
-        .sidebar {
-            width: 0;
+        .frame {
+            width: 70px;
+            height: 50px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .frame iframe {
+            width: 100%;
             height: 100%;
+        }
+
+        .nav {
             position: fixed;
             top: 0;
             left: 0;
-            background-color: red;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-            color: white;
-            text-align: center;
+            width: 100%;
+            height: 50px;
+            background-color: #ff0000; /* Red background for navigation */
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow for navbar */
         }
 
-        .sidebar a {
-            padding: 8px 8px 8px 32px;
+        .nav-heading {
+            font-size: 24px;
+            font-weight: bold;
+            color: white; /* White text color for heading */
+        }
+
+        .nav a {
+            color: white; /* White text color for links */
             text-decoration: none;
-            font-size: 20px;
-            color: white;
-            display: block;
-            transition: 0.3s;
+            margin: 0 15px;
+            font-size: 18px;
+            transition: color 0.2s ease;
         }
 
-        .sidebar a:hover {
-            color: #f1f1f1;
+        .nav a:hover {
+            color: #ff0000; /* Red color on hover */
         }
 
-        .closebtn {
-            position: absolute;
-            top: 0;
-            right: 25px;
-            font-size: 36px;
-            margin-left: 50px;
+        .nav-toggle {
+            display: none;
         }
 
-        .main {
-            flex: 1;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            margin-top: 0;
-            text-align: center;
-        }
-
-        input {
-            width: calc(100% - 40px);
+        input[type="text"],
+        input[type="number"],
+        button {
             padding: 10px;
-            margin: 10px 0;
+            margin: 5px;
+            border: none;
             border-radius: 5px;
-            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            background-color: #f2f2f2; /* Light gray background for inputs */
         }
 
         button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
+            background-color: #ff0000; /* Red background for button */
             color: white;
             cursor: pointer;
-            margin-left: 10px;
+            transition: background-color 0.2s ease;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #cc0000; /* Darker red on hover */
         }
 
-        #message {
+        .box {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow for box */
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff0000; /* Red color for heading */
+        }
+
+        em {
+            color: #666; /* Dark gray color for footer */
+            display: block;
             margin-top: 20px;
-            color: red;
+        }
+
+        /* Custom Alert Box Styles */
+        .alert-box {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+        }
+
+        .alert-content {
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .close-btn:hover {
+            color: #666;
+        }
+
+        @media screen and (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                height: auto;
+                padding: 20px 0;
+            }
+
+            .nav a {
+                margin: 10px 0;
+            }
+
+            .nav-toggle {
+                display: block;
+                position: absolute;
+                top: 10px;
+                right: 20px;
+                color: white;
+                font-size: 20px;
+                background: none;
+                border: none;
+                cursor: pointer;
+            }
+
+            .nav-items {
+                display: none;
+                position: absolute;
+                top: 50px;
+                left: 0;
+                width: 100%;
+                background-color: #ff0000;
+                z-index: 1;
+                padding: 20px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            .nav-items.show {
+                display: block;
+            }
+
+            .nav-items a {
+                display: block;
+                color: white;
+                text-decoration: none;
+                margin-bottom: 10px;
+                font-size: 18px;
+                transition: color 0.2s ease;
+            }
+
+            .nav-items a:hover {
+                color: #cc0000; /* Darker red color on hover */
+            }
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <div class="navbar">
-            <h1>Downloader</h1>
-            <div class="menu-icon" onclick="toggleSidebar()">
-                &#9776;
-            </div>
+    <div class="nav">
+        <div class="nav-heading">Monitizer</div>
+        <div class="nav-items">
+            <a href="https://www.instagram.com/maviya_706_?igsh=MWIzbWcyaGN4MHRiNA==">Instagram</a>
+            <a href="https://www.linkedin.com/in/maviya-attar-59b619293?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app">LinkedIn</a>
+            
         </div>
-
-        <div class="content">
-            <div class="sidebar" id="sidebar">
-                <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">&times;</a>
-                <a href="https://www.instagram.com" target="_blank">Follow on Instagram</a>
-                <a href="https://www.facebook.com" target="_blank">Follow on Facebook</a>
-                <a href="https://www.twitter.com" target="_blank">Follow on Twitter</a>
-                <a href="https://www.linkedin.com" target="_blank">Follow on LinkedIn</a>
-            </div>
-
-            <div class="main">
-                <h1>Video Downloader</h1>
-                <input type="text" id="urlInput" placeholder="Enter video URL">
-                <button id="downloadBtn">Download</button>
-                <div id="message"></div>
-            </div>
+        <div class="nav-toggle" onclick="toggleNav()">
+            ☰
         </div>
     </div>
 
+    <div class="alert-box" id="alertBox">
+        <div class="alert-content">
+            <span class="close-btn" onclick="closeAlert()">×</span>
+            <p id="alertMessage"></p>
+        </div>
+    </div>
+
+    <div class="box">
+        <h1>Insert YouTube Video Link</h1>
+        <input type="text" id="videoLink" placeholder="Enter YouTube video link">
+        <input type="number" id="frameCount" placeholder="Enter number of frames" min="1" value="10">
+        <button onclick="addFrames()">Add Frames</button>
+    </div>
+
+    <br>
+    <br>
+    <em>by Maviya</em>
+
+    <div id="container"></div>
+
     <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.style.width = sidebar.style.width === '250px' ? '0' : '250px';
-        }
-
-        document.getElementById('downloadBtn').addEventListener('click', async function() {
-            const url = document.getElementById('urlInput').value;
-
-            if (isValidUrl(url)) {
-                try {
-                    const videoID = getVideoID(url);
-                    const downloadUrl = `https://www.youtube.com/watch?v=${videoID}`;
-                    const response = await fetch(downloadUrl);
-                    const blob = await response.blob();
-                    const filename = `${videoID}.mp4`;
-
-                    // Create a link element, set its href and download attributes, then simulate click
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    document.body.appendChild(a);
-
-                    const url = window.URL.createObjectURL(blob);
-                    a.href = url;
-                    a.download = filename;
-                    a.click();
-
-                    // Clean up
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-
-                    document.getElementById('message').textContent = "Video downloaded successfully.";
-                } catch (error) {
-                    document.getElementById('message').textContent = "Failed to download video.";
-                    console.error('Error downloading video:', error);
-                }
-            } else {
-                document.getElementById('message').textContent = "Please enter a valid YouTube URL.";
+        function addFrames() {
+            const videoLink = document.getElementById('videoLink').value;
+            const frameCount = parseInt(document.getElementById('frameCount').value);
+            const videoId = extractVideoId(videoLink);
+            if (!videoId) {
+                showAlert('Invalid YouTube link!');
+                return;
             }
-        });
+            const container = document.getElementById('container');
+            container.innerHTML = '';
 
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (_) {
-                return false;  
+            for (let i = 0; i < frameCount; i++) {
+                const frame = document.createElement('div');
+                frame.className = 'frame';
+
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${videoId}?start=${i * 5}&autoplay=1&mute=1`;
+                iframe.frameBorder = '0';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+
+                frame.appendChild(iframe);
+                container.appendChild(frame);
             }
         }
 
-        function getVideoID(url) {
-            const urlParams = new URLSearchParams(new URL(url).search);
-            return urlParams.get('v');
+        function extractVideoId(url) {
+            const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+
+        function toggleNav() {
+            const navItems = document.querySelector('.nav-items');
+            navItems.classList.toggle('show');
+        }
+
+        function showAlert(message) {
+            const alertBox = document.getElementById('alertBox');
+            const alertMessage = document.getElementById('alertMessage');
+            alertMessage.textContent = message;
+            alertBox.style.display = 'block';
+        }
+
+        function closeAlert() {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.style.display = 'none';
         }
     </script>
 </body>
-                </html>
+    </html>
