@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .navbar {
+            background-color: red;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .sidebar {
+            width: 0;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: red;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            color: white;
+            text-align: center;
+        }
+
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 20px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+
+        .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        .main {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        input {
+            width: calc(100% - 40px);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #message {
+            margin-top: 20px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="navbar">
+            <h1>Downloader</h1>
+            <div class="menu-icon" onclick="toggleSidebar()">
+                &#9776;
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="sidebar" id="sidebar">
+                <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">&times;</a>
+                <a href="https://www.instagram.com" target="_blank">Follow on Instagram</a>
+                <a href="https://www.facebook.com" target="_blank">Follow on Facebook</a>
+                <a href="https://www.twitter.com" target="_blank">Follow on Twitter</a>
+                <a href="https://www.linkedin.com" target="_blank">Follow on LinkedIn</a>
+            </div>
+
+            <div class="main">
+                <h1>Video Downloader</h1>
+                <input type="text" id="urlInput" placeholder="Enter video URL">
+                <button id="downloadBtn">Download</button>
+                <div id="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.style.width = sidebar.style.width === '250px' ? '0' : '250px';
+        }
+
+        document.getElementById('downloadBtn').addEventListener('click', async function() {
+            const url = document.getElementById('urlInput').value;
+
+            if (isValidUrl(url)) {
+                try {
+                    const videoID = getVideoID(url);
+                    const downloadUrl = `https://www.youtube.com/watch?v=${videoID}`;
+                    const response = await fetch(downloadUrl);
+                    const blob = await response.blob();
+                    const filename = `${videoID}.mp4`;
+
+                    // Create a link element, set its href and download attributes, then simulate click
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+
+                    const url = window.URL.createObjectURL(blob);
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+
+                    // Clean up
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    document.getElementById('message').textContent = "Video downloaded successfully.";
+                } catch (error) {
+                    document.getElementById('message').textContent = "Failed to download video.";
+                    console.error('Error downloading video:', error);
+                }
+            } else {
+                document.getElementById('message').textContent = "Please enter a valid YouTube URL.";
+            }
+        });
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;  
+            }
+        }
+
+        function getVideoID(url) {
+            const urlParams = new URLSearchParams(new URL(url).search);
+            return urlParams.get('v');
+        }
+    </script>
+</body>
+                </html>
